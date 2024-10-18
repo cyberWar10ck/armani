@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Shareholders</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>ثبت پروژه و سهام‌داران</h1>
+        </div>
+    </header>
+    <div class="container">
+        <form action="" method="post">
+            <label for="project_name">نام پروژه:</label>
+            <input type="text" id="project_name" name="project_name" required>
+            <br>
+            <label for="shareholders_count">تعداد سهام‌داران:</label>
+            <input type="number" id="shareholders_count" name="shareholders_count" required>
+            <br>
+            <!-- ورودی‌های سهام‌داران -->
+            <div id="shareholders-inputs"></div>
+            <br>
+            <button type="submit">ارسال</button>
+        </form>
+
+        <h2>پروژه‌های ثبت شده</h2>
+        <ul>
+            {% for project in projects %}
+                <li>
+                    <strong>نام پروژه:</strong> {{ project.name }}
+                    <ul>
+                        {% for shareholder in project.shareholders %}
+                            <li>
+                                <strong>نام سهام‌دار:</strong> {{ shareholder.name }} - 
+                                <strong>درصد سهم:</strong> {{ shareholder.percentage }}%
+                                <ul>
+                                    {% for partner in shareholder.partners %}
+                                        <li>
+                                            <strong>نام شریک:</strong> {{ partner.name }} - 
+                                            <strong>درصد سهم:</strong> {{ partner.percentage }}%
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <script>
+        document.getElementById('shareholders_count').addEventListener('input', function() {
+            const count = parseInt(this.value, 10);
+            const container = document.getElementById('shareholders-inputs');
+            container.innerHTML = '';
+            
+            for (let i = 0; i < count; i++) {
+                container.innerHTML += `
+                    <fieldset>
+                        <legend>سهام‌دار ${i + 1}</legend>
+                        <label for="shareholder_${i}_name">نام سهام‌دار:</label>
+                        <input type="text" id="shareholder_${i}_name" name="shareholder_${i}_name" required>
+                        <br>
+                        <label for="shareholder_${i}_percentage">درصد سهم:</label>
+                        <input type="number" id="shareholder_${i}_percentage" name="shareholder_${i}_percentage" step="0.01" required>
+                        <br>
+                        <label for="shareholder_${i}_partners_count">تعداد شرکا:</label>
+                        <input type="number" id="shareholder_${i}_partners_count" name="shareholder_${i}_partners_count" data-shareholder-index="${i}" required>
+                        <br>
+                        <div id="shareholder_${i}_partners_inputs"></div>
+                    </fieldset>
+                `;
+                
+                document.getElementById(`shareholder_${i}_partners_count`).addEventListener('input', function() {
+                    const partnersCount = parseInt(this.value, 10);
+                    const partnerContainer = document.getElementById(`shareholder_${this.dataset.shareholderIndex}_partners_inputs`);
+                    partnerContainer.innerHTML = '';
+                    
+                    for (let j = 0; j < partnersCount; j++) {
+                        partnerContainer.innerHTML += `
+                            <fieldset>
+                                <legend>شریک ${j + 1}</legend>
+                                <label for="shareholder_${this.dataset.shareholderIndex}_partner_${j}_name">نام شریک:</label>
+                                <input type="text" id="shareholder_${this.dataset.shareholderIndex}_partner_${j}_name" name="shareholder_${this.dataset.shareholderIndex}_partner_${j}_name" required>
+                                <br>
+                                <label for="shareholder_${this.dataset.shareholderIndex}_partner_${j}_percentage">درصد سهم:</label>
+                                <input type="number" id="shareholder_${this.dataset.shareholderIndex}_partner_${j}_percentage" name="shareholder_${this.dataset.shareholderIndex}_partner_${j}_percentage" step="0.01" required>
+                            </fieldset>
+                        `;
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
