@@ -61,7 +61,7 @@ def index():
             
         
         return redirect(url_for('index'))
-    
+    #this is test comment for commit author change
     projects = Project.query.all()
     return render_template('index.html', projects=projects)
 
